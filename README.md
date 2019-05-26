@@ -1,4 +1,4 @@
-# BMX-COM API
+# X-COMM API
 ## Springboot
 ./gradlew runBoot
 
