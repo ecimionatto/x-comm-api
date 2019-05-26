@@ -1,0 +1,35 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.5.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+bootJar {
+    baseName = 'x-comm-api'
+    version =  '0.1.0'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-webflux')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile ('org.mongodb:mongodb-driver-reactivestreams:1.11.0')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('io.projectreactor:reactor-test')
+}
