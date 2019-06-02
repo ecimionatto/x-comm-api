@@ -15,11 +15,26 @@ public class Communication {
     @Id
     private final String id;
     private final String message;
+    private final String address;
+    private final CommunicationType type;
 
     @JsonCreator
-    public Communication(@JsonProperty("id") final String id, @JsonProperty("message") final String message) {
+    public Communication(@JsonProperty("id") final String id,
+                         @JsonProperty("message") final String message,
+                         @JsonProperty("address") final String address,
+                         @JsonProperty("type") final CommunicationType type) {
         this.id = id == null ? UUID.randomUUID().toString() : id;
         this.message = message;
+        this.address = address;
+        this.type = type;
+    }
+
+    public CommunicationType getType() {
+        return type;
+    }
+
+    public String getAddress() {
+        return address;
     }
 
     public String getId() {
@@ -28,6 +43,10 @@ public class Communication {
 
     public String getMessage() {
         return message;
+    }
+
+    public enum CommunicationType {
+        SLACK, EMAIL
     }
 
 }

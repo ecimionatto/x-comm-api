@@ -39,7 +39,8 @@ public class CommunicationController {
     @PutMapping("{id}")
     public Mono<Communication> createOrUpdate(@PathVariable(value = "id") String id,
                                            @RequestBody Communication communication) {
-        return communicationRepository.save(new Communication(id, communication.getMessage()));
+        return communicationRepository.save(new Communication(id, communication.getMessage(),
+                communication.getAddress(), communication.getType()));
     }
 
 }
