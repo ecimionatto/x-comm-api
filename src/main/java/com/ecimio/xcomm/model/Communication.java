@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
 import java.util.UUID;
 
 @Document
@@ -16,21 +17,25 @@ public class Communication {
     private final String id;
     private final String message;
     private final String address;
-    private final CommunicationType type;
+    private final List<CommunicationType> types;
+    private final String scheduledTime;
 
     @JsonCreator
-    public Communication(@JsonProperty("id") final String id,
-                         @JsonProperty("message") final String message,
-                         @JsonProperty("address") final String address,
-                         @JsonProperty("type") final CommunicationType type) {
+    public Communication(@JsonProperty(value = "id", required = true) final String id,
+                         @JsonProperty(value = "message", required = true) final String message,
+                         @JsonProperty(value = "address", required = true) final String address,
+                         @JsonProperty(value = "scheduledTime", required = true) final String scheduledTime,
+                         @JsonProperty(value = "types", required = true) final List<CommunicationType> types
+    ) {
         this.id = id == null ? UUID.randomUUID().toString() : id;
         this.message = message;
         this.address = address;
-        this.type = type;
+        this.types = types;
+        this.scheduledTime = scheduledTime;
     }
 
-    public CommunicationType getType() {
-        return type;
+    public List<CommunicationType> getTypes() {
+        return types;
     }
 
     public String getAddress() {
@@ -43,6 +48,10 @@ public class Communication {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getScheduledTime() {
+        return scheduledTime;
     }
 
     public enum CommunicationType {

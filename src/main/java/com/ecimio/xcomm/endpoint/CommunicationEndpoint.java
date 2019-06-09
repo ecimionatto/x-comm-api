@@ -30,9 +30,9 @@ public class CommunicationEndpoint {
         final Mono<Communication> savedCom = communication.flatMap(requestCom ->
                 communicationRepository.findById(id)
                         .flatMap(existing -> communicationRepository.save(new Communication(existing.getId(),
-                                requestCom.getMessage(), requestCom.getAddress(), requestCom.getType())))
+                                requestCom.getMessage(), requestCom.getAddress(), requestCom.getScheduledTime(), requestCom.getTypes())))
                         .switchIfEmpty(communicationRepository.save(new Communication(id,
-                                requestCom.getMessage(), requestCom.getAddress(), requestCom.getType())))
+                                requestCom.getMessage(), requestCom.getAddress(), requestCom.getScheduledTime(), requestCom.getTypes())))
         );
 
         final BodyInserter<Mono<Communication>, ReactiveHttpOutputMessage> inserter =
