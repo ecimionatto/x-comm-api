@@ -1,27 +1,26 @@
 package com.ecimio.xcomm.service;
 
+import com.ecimio.xcomm.model.Communication;
 import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.webhook.Payload;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class SlackCommand {
+public class SlackCommand implements MessageCommand {
 
     @Value("${slack.webhook}")
     private String webhook;
 
-    @Scheduled(fixedDelay = 1000 * 60 * 5)
-    public void sendMessages() {
+    public void send(final Communication communication) {
 
         Payload payload = Payload.builder()
-                .channel("#x-comm-test")
-                .username("jSlack Bot")
+                .channel(communication.getSlackTo().orElseThrow(IllegalStateException::new))
+                .username("xcomm")
                 .iconEmoji(":smile_cat:")
-                .text("Hello World!")
+                .text(communication.getMessage())
                 .build();
 
         Slack slack = Slack.getInstance();

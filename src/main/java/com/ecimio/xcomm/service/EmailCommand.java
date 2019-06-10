@@ -1,7 +1,7 @@
 package com.ecimio.xcomm.service;
 
+import com.ecimio.xcomm.model.Communication;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
@@ -18,9 +18,7 @@ public class EmailCommand {
     @Value("${email.pass}")
     private String pass;
 
-
-    @Scheduled(fixedDelay = 1000 * 60 * 5)
-    public void send() {
+    public void send(final Communication communication) {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -41,11 +39,10 @@ public class EmailCommand {
             message.setFrom(new InternetAddress("xcomm.message@gmail.com"));
             message.setRecipients(
                     Message.RecipientType.TO,
-                    InternetAddress.parse("ecimionatto@gmail.com")
+                    InternetAddress.parse(communication.getEmailTo().orElseThrow(IllegalStateException::new))
             );
-            message.setSubject("Testing Gmail TLS");
-            message.setText("Dear Mail Crawler,"
-                    + "\n\n Please do not spam my email!");
+            message.setSubject("XComm Communication");
+            message.setText(communication.getMessage());
 
             Transport.send(message);
 

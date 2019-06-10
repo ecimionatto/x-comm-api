@@ -43,7 +43,9 @@ public class CommunicationController {
     public Mono<Communication> createOrUpdate(@PathVariable(value = "id") String id,
                                               @RequestBody Communication communication) {
         return communicationRepository.save(new Communication(id, communication.getMessage(),
-                communication.getAddress(), communication.getScheduledTime(), communication.getTypes()));
+                communication.getEmailTo().orElse(null),
+                communication.getSlackTo().orElse(null),
+                communication.getScheduledTime()));
     }
 
 }
