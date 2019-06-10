@@ -29,6 +29,9 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}")
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile ('org.mongodb:mongodb-driver-reactivestreams:1.11.0')
+    compile ('com.github.seratch:jslack:0.1.5')
+    compile ('javax.mail:mail:1.4.7')
+
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.projectreactor:reactor-test')
 }

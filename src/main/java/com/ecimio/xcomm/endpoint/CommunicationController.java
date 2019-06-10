@@ -16,8 +16,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/xcomm", consumes = APPLICATION_JSON_VALUE)
 public class CommunicationController {
 
-    @Autowired
     private CommunicationRepository communicationRepository;
+
+    public CommunicationController(@Autowired final CommunicationRepository communicationRepository) {
+        this.communicationRepository = communicationRepository;
+    }
 
     @GetMapping
     public Flux<Communication> getAll() {
@@ -38,8 +41,11 @@ public class CommunicationController {
 
     @PutMapping("{id}")
     public Mono<Communication> createOrUpdate(@PathVariable(value = "id") String id,
-                                           @RequestBody Communication communication) {
-        return communicationRepository.save(new Communication(id, communication.getMessage()));
+                                              @RequestBody Communication communication) {
+        return communicationRepository.save(new Communication(id, communication.getMessage(),
+                communication.getEmailTo().orElse(null),
+                communication.getSlackTo().orElse(null),
+                communication.getScheduledTime()));
     }
 
 }
