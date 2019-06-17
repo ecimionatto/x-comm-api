@@ -1,11 +1,13 @@
 package com.ecimio.xcomm.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,20 +21,29 @@ public class Communication {
     private final String message;
     private final String emailTo;
     private final String slackTo;
-    private final String scheduledTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+    private final Date scheduledTime;
+    private final CommunicationStatus status;
+    private final String error;
 
     @JsonCreator
     public Communication(@JsonProperty(value = "id") final String id,
                          @JsonProperty(value = "message", required = true) final String message,
                          @JsonProperty(value = "emailTo") final String emailTo,
                          @JsonProperty(value = "slackTo") final String slackTo,
-                         @JsonProperty(value = "scheduledTime", required = true) final String scheduledTime
+                         @JsonProperty(value = "scheduledTime", required = true) final Date scheduledTime,
+                         @JsonProperty(value = "status") final CommunicationStatus status,
+                         @JsonProperty(value = "error") final String error
+
     ) {
         this.id = id == null ? UUID.randomUUID().toString() : id;
         this.message = message;
         this.emailTo = emailTo;
         this.slackTo = slackTo;
         this.scheduledTime = scheduledTime;
+        this.status = status == null ? CommunicationStatus.PENDING : status;
+        this.error = error;
     }
 
     public Optional<String> getSlackTo() {
@@ -48,7 +59,6 @@ public class Communication {
             return List.of(CommunicationType.SLACK);
         }
         return List.of();
-
     }
 
     public Optional<String> getEmailTo() {
@@ -63,12 +73,32 @@ public class Communication {
         return message;
     }
 
-    public String getScheduledTime() {
+    public Date getScheduledTime() {
         return scheduledTime;
+    }
+
+    public Communication withStatus(CommunicationStatus communicationStatus) {
+        return new Communication(this.id, this.message, this.emailTo, this.slackTo, this.scheduledTime, communicationStatus, null);
+    }
+
+    public Communication withError(String error) {
+        return new Communication(this.id, this.message, this.emailTo, this.slackTo, this.scheduledTime, CommunicationStatus.ERROR, error);
+    }
+
+    public CommunicationStatus getStatus() {
+        return status;
+    }
+
+    public Optional<String> getError() {
+        return Optional.ofNullable(error);
     }
 
     public enum CommunicationType {
         SLACK, EMAIL
+    }
+
+    public enum CommunicationStatus {
+        PENDING, SENT, ERROR
     }
 
 }
