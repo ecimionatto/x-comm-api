@@ -1,6 +1,7 @@
 package com.ecimio.xcomm.service;
 
 import com.ecimio.xcomm.model.Communication;
+import com.ecimio.xcomm.model.CommunicationException;
 import com.ecimio.xcomm.repo.CommunicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -36,7 +37,7 @@ public class MessageDispatch {
                 .filter(communication -> communication.getStatus() == Communication.CommunicationStatus.PENDING
                         && communication.getScheduledTime().toInstant().isBefore(Instant.now()))
                 .map(this::attemptToSend)
-                .onErrorMap(IllegalStateException.class, e -> {
+                .onErrorMap(CommunicationException.class, e -> {
                     final Mono<Communication> byId = communicationRepository.findById(e.getMessage());
                     reactiveMongoOperations.save(byId);
                     return e;
@@ -55,7 +56,7 @@ public class MessageDispatch {
                 slackCommand.send(communication);
             }
         } catch (Exception e) {
-            throw new IllegalStateException(communication.getId());
+            throw new CommunicationException(communication.getId(), e);
         }
         return communication;
     }
