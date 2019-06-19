@@ -4,39 +4,40 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
 @Document
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Dashboard {
 
     @Id
-    private final String id = UUID.randomUUID().toString();
+    private final String id;
+    private int sent;
+    private int failed;
 
-    private final AtomicInteger sent;
-    private final AtomicInteger error;
-
-    public Dashboard() {
-        this.sent = new AtomicInteger();
-        this.error = new AtomicInteger();
+    public Dashboard(final String id, final int sent, final int failed) {
+        this.id = id;
+        this.sent = sent;
+        this.failed = failed;
     }
 
-    public AtomicInteger getSent() {
+    public String getId() {
+        return id;
+    }
+
+    public int getSent() {
         return sent;
     }
 
-    public AtomicInteger getError() {
-        return error;
+    public int getFailed() {
+        return failed;
     }
 
-    public Dashboard incrementSent() {
-        sent.incrementAndGet();
+    public synchronized Dashboard incrementSent() {
+        this.sent++;
         return this;
     }
 
-    public Dashboard incrementError() {
-        error.incrementAndGet();
+    public synchronized Dashboard incrementError() {
+        this.failed++;
         return this;
     }
 
