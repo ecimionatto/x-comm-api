@@ -33,9 +33,9 @@ public class CommunicationController {
     }
 
     @GetMapping("{id}")
-    public Mono<ResponseEntity<Communication>> getById(@PathVariable(value = "id") String tweetId) {
-        return communicationRepository.findById(tweetId)
-                .map(savedTweet -> ResponseEntity.ok(savedTweet))
+    public Mono<ResponseEntity<Communication>> getById(@PathVariable(value = "id") String id) {
+        return communicationRepository.findById(id)
+                .map(savedCommunication -> ResponseEntity.ok(savedCommunication))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
@@ -45,7 +45,7 @@ public class CommunicationController {
         return communicationRepository.save(new Communication(id, communication.getMessage(),
                 communication.getEmailTo().orElse(null),
                 communication.getSlackTo().orElse(null),
-                communication.getScheduledTime()));
+                communication.getScheduledTime(), null, null));
     }
 
 }

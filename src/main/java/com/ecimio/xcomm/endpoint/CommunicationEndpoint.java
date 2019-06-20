@@ -33,12 +33,12 @@ public class CommunicationEndpoint {
                                 requestCom.getMessage(),
                                 requestCom.getEmailTo().orElse(null),
                                 requestCom.getSlackTo().orElse(null),
-                                requestCom.getScheduledTime())))
+                                requestCom.getScheduledTime(), null, null)))
                         .switchIfEmpty(communicationRepository.save(new Communication(id,
                                 requestCom.getMessage(),
                                 requestCom.getEmailTo().orElse(null),
                                 requestCom.getSlackTo().orElse(null),
-                                requestCom.getScheduledTime())))
+                                requestCom.getScheduledTime(), null, null)))
         );
 
         final BodyInserter<Mono<Communication>, ReactiveHttpOutputMessage> inserter =
