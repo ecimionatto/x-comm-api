@@ -37,7 +37,7 @@ public class MessageDispatch {
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 1000 * 60 * 1)
+    @Scheduled(fixedDelay = 1000 * 30 * 1)
     public void send() {
         communicationRepository
                 .findAll()
