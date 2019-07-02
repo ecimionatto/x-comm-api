@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 @EnableScheduling
 @EnableWebFlux
-public class BmxComRouter implements WebFluxConfigurer {
+public class EndpointRouter implements WebFluxConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {

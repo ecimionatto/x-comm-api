@@ -1,6 +1,8 @@
 package com.ecimio.xcomm.service;
 
 import com.ecimio.xcomm.model.Communication;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,8 @@ import java.util.Properties;
 @Component
 public class EmailCommand {
 
+    private static final Logger logger = LogManager.getLogger(EmailCommand.class);
+
     @Value("${email.user}")
     private String user;
 
@@ -19,6 +23,8 @@ public class EmailCommand {
     private String pass;
 
     public void send(final Communication communication) {
+
+        logger.debug("send started");
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -46,7 +52,10 @@ public class EmailCommand {
 
             Transport.send(message);
 
+            logger.debug("send completed message={}", message);
+
         } catch (MessagingException e) {
+            logger.error("send error", e);
             throw new IllegalStateException(e);
         }
     }

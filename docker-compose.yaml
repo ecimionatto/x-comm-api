@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  mongodb:
+    container_name: some-mongo
+    image: mongo
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+
+  x-comm-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: x-comm-api
+    ports:
+      - "8080:8080"
+      - "8077:8077"
+      - "5005:5005"
+    depends_on:
+      - mongodb
+    environment:
+      - spring_profiles_active=docker
+      - MONGODB_HOST=mongodb

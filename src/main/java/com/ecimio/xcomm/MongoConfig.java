@@ -14,15 +14,19 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @EnableReactiveMongoRepositories(basePackages = "com.ecimio.xcomm.*")
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
-    @Value("${port}")
+    @Value("${mongo.port}")
     private String port;
 
-    @Value("${dbname}")
+    @Value("${mongo.dbname}")
     private String dbName;
+
+    @Value("${mongo.hostname}")
+    private String hostname;
 
     @Override
     public MongoClient reactiveMongoClient() {
-        return MongoClients.create();
+        String myHost = System.getenv("MONGODB_HOST");
+        return MongoClients.create("mongodb://" + (myHost == null ? hostname : myHost) + ":" + port);
     }
 
     @Override
