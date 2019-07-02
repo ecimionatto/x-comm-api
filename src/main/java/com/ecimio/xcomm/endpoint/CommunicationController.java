@@ -48,4 +48,10 @@ public class CommunicationController {
                 communication.getScheduledTime(), null, null));
     }
 
+    @DeleteMapping("{id}")
+    public Mono<Void> delete(@PathVariable(value = "id") String id) {
+        return communicationRepository.deleteById(id);
+    }
+
+
 }

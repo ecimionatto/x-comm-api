@@ -36,13 +36,17 @@ public class TemplateController {
     public Mono<ResponseEntity<Template>> getById(@PathVariable(value = "id") String id) {
         return templateRepository.findById(id)
                 .map(saved -> ResponseEntity.ok(saved))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .defaultIfEmpty(ResponseEntity.notFound()
+                        .build());
     }
 
     @PutMapping("{id}")
     public Mono<Template> createOrUpdate(@PathVariable(value = "id") String id,
                                          @RequestBody Template template) {
-        return templateRepository.save(new Template(id, template.getMessage()));
+        return templateRepository.save(new Template(
+                id,
+                template.getName(),
+                template.getMessage()));
     }
 
     @DeleteMapping("{id}")
