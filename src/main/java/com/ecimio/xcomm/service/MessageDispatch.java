@@ -2,8 +2,10 @@ package com.ecimio.xcomm.service;
 
 import com.ecimio.xcomm.model.Communication;
 import com.ecimio.xcomm.model.CommunicationException;
+import com.ecimio.xcomm.model.Settings;
 import com.ecimio.xcomm.repo.CommunicationRepository;
 import com.ecimio.xcomm.repo.DashboardRepository;
+import com.ecimio.xcomm.repo.SettingsRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +28,21 @@ public class MessageDispatch {
     private final CommunicationRepository communicationRepository;
     private final ReactiveMongoOperations reactiveMongoOperations;
     private final DashboardRepository dashboardRepository;
+    private final SettingsRepository settingsRepository;
 
     @Autowired
     public MessageDispatch(final EmailCommand emailCommand,
                            final SlackCommand slackCommand,
                            final CommunicationRepository communicationRepository,
                            final DashboardRepository dashboardRepository,
-                           final ReactiveMongoOperations reactiveMongoOperations) {
+                           final ReactiveMongoOperations reactiveMongoOperations,
+                           final SettingsRepository settingsRepository) {
         this.emailCommand = emailCommand;
         this.slackCommand = slackCommand;
         this.communicationRepository = communicationRepository;
         this.dashboardRepository = dashboardRepository;
         this.reactiveMongoOperations = reactiveMongoOperations;
+        this.settingsRepository = settingsRepository;
     }
 
     @Transactional
@@ -48,7 +53,7 @@ public class MessageDispatch {
                 .findAll()
                 .filter(communication -> communication.getStatus() == Communication.CommunicationStatus.PENDING
                         && communication.getScheduledTime().toInstant().isBefore(Instant.now()))
-                .map(this::attemptToSend)
+                .zipWith(settingsRepository.findAll().take(1), this::attemptToSend)
                 .onErrorMap(CommunicationException.class, e -> handleError(e))
                 .map(communication -> communication.withStatus(Communication.CommunicationStatus.SENT))
                 .flatMap(reactiveMongoOperations::remove)
@@ -68,13 +73,13 @@ public class MessageDispatch {
         return e;
     }
 
-    private Communication attemptToSend(final Communication communication) {
+    private Communication attemptToSend(final Communication communication, final Settings settings) {
         try {
             if (communication.getTypes().contains(Communication.CommunicationType.EMAIL)) {
-                emailCommand.send(communication);
+                emailCommand.send(communication, settings);
             }
             if (communication.getTypes().contains(Communication.CommunicationType.SLACK)) {
-                slackCommand.send(communication);
+                slackCommand.send(communication, settings);
             }
         } catch (Exception e) {
             throw new CommunicationException(communication.getId(), e);

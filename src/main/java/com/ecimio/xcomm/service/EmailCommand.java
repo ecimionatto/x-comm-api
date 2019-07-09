@@ -1,9 +1,9 @@
 package com.ecimio.xcomm.service;
 
 import com.ecimio.xcomm.model.Communication;
+import com.ecimio.xcomm.model.Settings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
@@ -12,17 +12,11 @@ import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 @Component
-public class EmailCommand {
+public class EmailCommand implements MessageCommand {
 
     private static final Logger logger = LogManager.getLogger(EmailCommand.class);
 
-    @Value("${email.user}")
-    private String user;
-
-    @Value("${email.pass}")
-    private String pass;
-
-    public void send(final Communication communication) {
+    public void send(final Communication communication, final Settings settings) {
 
         logger.debug("send started");
 
@@ -35,7 +29,8 @@ public class EmailCommand {
         Session session = Session.getInstance(prop,
                 new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(user, pass);
+                        return new PasswordAuthentication(settings.getSmtpUser(),
+                                settings.getSmtpPass());
                     }
                 });
 
