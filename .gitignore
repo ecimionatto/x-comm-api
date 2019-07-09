@@ -16,6 +16,3 @@
 # Gradle:
 .idea/gradle.xml
 .idea/libraries
-
-#resources
-/src/main/resources/application.properties

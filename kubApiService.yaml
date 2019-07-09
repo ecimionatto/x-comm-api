@@ -5,9 +5,10 @@ metadata:
   labels:
     run: x-comm-api
 spec:
-  type: NodePort
-  ports:
-    - port: 8080
-      protocol: TCP
   selector:
     app: x-comm-api
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: http
