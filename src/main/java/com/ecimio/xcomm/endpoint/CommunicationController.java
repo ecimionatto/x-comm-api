@@ -31,8 +31,8 @@ public class CommunicationController {
     }
 
     @PostMapping
-    public Mono<Communication> create(@Valid @RequestBody Communication communication) {
-        return communicationRepository.save(communication);
+    public Flux<Communication> create(@Valid @RequestBody Communication communication) {
+        return communicationRepository.saveWithRecurrence(communication);
     }
 
     @GetMapping("{id}")
@@ -49,7 +49,10 @@ public class CommunicationController {
                 communication.getEmailTo().orElse(null),
                 communication.getSlackTo().orElse(null),
                 communication.getUser(),
-                communication.getScheduledTime(), null, null));
+                communication.getScheduledTime(),
+                null,
+                null,
+                communication.getRecurrence()));
     }
 
     @DeleteMapping("{id}")

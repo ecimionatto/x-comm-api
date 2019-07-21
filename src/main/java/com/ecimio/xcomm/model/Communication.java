@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +29,7 @@ public class Communication {
     private final Date scheduledTime;
     private final CommunicationStatus status;
     private final String error;
+    private final CommunicationRecurrence recurrence;
 
     @JsonCreator
     public Communication(@JsonProperty(value = "id") final String id,
@@ -35,9 +39,8 @@ public class Communication {
                          @JsonProperty(value = "user", required = true) final String user,
                          @JsonProperty(value = "scheduledTime", required = true) final Date scheduledTime,
                          @JsonProperty(value = "status") final CommunicationStatus status,
-                         @JsonProperty(value = "error") final String error
-
-    ) {
+                         @JsonProperty(value = "error") final String error,
+                         @JsonProperty(value = "recurrence") final CommunicationRecurrence recurrence) {
         this.id = id == null ? UUID.randomUUID().toString() : id;
         this.message = message;
         this.emailTo = emailTo;
@@ -46,6 +49,11 @@ public class Communication {
         this.scheduledTime = scheduledTime;
         this.status = status == null ? CommunicationStatus.PENDING : status;
         this.error = error;
+        this.recurrence = recurrence;
+    }
+
+    public CommunicationRecurrence getRecurrence() {
+        return recurrence;
     }
 
     public String getUser() {
@@ -85,17 +93,17 @@ public class Communication {
 
     public Communication withStatus(CommunicationStatus communicationStatus) {
         return new Communication(this.id, this.message, this.emailTo,
-                this.slackTo, this.user, this.scheduledTime, communicationStatus, null);
+                this.slackTo, this.user, this.scheduledTime, communicationStatus, null, this.recurrence);
     }
 
     public Communication withUser(final String user) {
         return new Communication(this.id, this.message, this.emailTo,
-                this.slackTo, user, this.scheduledTime, this.status, null);
+                this.slackTo, user, this.scheduledTime, this.status, null, this.recurrence);
     }
 
     public Communication withError(String error) {
         return new Communication(this.id, this.message, this.emailTo,
-                this.slackTo, this.user, this.scheduledTime, CommunicationStatus.ERROR, error);
+                this.slackTo, this.user, this.scheduledTime, CommunicationStatus.ERROR, error, this.recurrence);
     }
 
     public CommunicationStatus getStatus() {
@@ -116,6 +124,21 @@ public class Communication {
 
     public enum CommunicationStatus {
         PENDING, SENT, ERROR, DELETED
+    }
+
+    public enum CommunicationRecurrence {
+        NEVER, DAILY, WEEKLY, MONTHLY
+    }
+
+    public Communication newInstanceWithScheduledTime(final LocalDateTime time) {
+        final Instant instant = time.toInstant(OffsetDateTime.now().getOffset());
+        return new Communication(null, this.message, this.emailTo,
+                this.slackTo,
+                this.user,
+                Date.from(instant),
+                this.status,
+                null,
+                this.recurrence);
     }
 
 }

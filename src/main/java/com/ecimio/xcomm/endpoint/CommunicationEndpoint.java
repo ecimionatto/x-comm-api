@@ -34,13 +34,19 @@ public class CommunicationEndpoint {
                                 requestCom.getEmailTo().orElse(null),
                                 requestCom.getSlackTo().orElse(null),
                                 requestCom.getUser(),
-                                requestCom.getScheduledTime(), null, null)))
+                                requestCom.getScheduledTime(),
+                                null,
+                                null,
+                                requestCom.getRecurrence())))
                         .switchIfEmpty(communicationRepository.save(new Communication(id,
                                 requestCom.getMessage(),
                                 requestCom.getEmailTo().orElse(null),
                                 requestCom.getSlackTo().orElse(null),
                                 requestCom.getUser(),
-                                requestCom.getScheduledTime(), null, null)))
+                                requestCom.getScheduledTime(),
+                                null,
+                                null,
+                                requestCom.getRecurrence())))
         );
 
         final BodyInserter<Mono<Communication>, ReactiveHttpOutputMessage> inserter =
