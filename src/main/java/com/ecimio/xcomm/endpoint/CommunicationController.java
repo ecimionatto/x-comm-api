@@ -25,7 +25,9 @@ public class CommunicationController {
 
     @GetMapping
     public Flux<Communication> getAll() {
-        return communicationRepository.findAll();
+        return communicationRepository
+                .findAll()
+                .filter(Communication::isPending);
     }
 
     @PostMapping
@@ -46,12 +48,17 @@ public class CommunicationController {
         return communicationRepository.save(new Communication(id, communication.getMessage(),
                 communication.getEmailTo().orElse(null),
                 communication.getSlackTo().orElse(null),
+                communication.getUser(),
                 communication.getScheduledTime(), null, null));
     }
 
     @DeleteMapping("{id}")
-    public Mono<Void> delete(@PathVariable(value = "id") String id) {
-        return communicationRepository.deleteById(id);
+    public Mono<Communication> delete(@PathVariable(value = "id") final String id,
+                                      @RequestBody final String user) {
+        return communicationRepository.findById(id)
+                .flatMap(communication -> communicationRepository.save(communication
+                        .withStatus(Communication.CommunicationStatus.DELETED)
+                        .withUser(user)));
     }
 
 

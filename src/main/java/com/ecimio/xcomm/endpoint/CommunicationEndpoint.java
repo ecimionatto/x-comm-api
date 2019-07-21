@@ -33,11 +33,13 @@ public class CommunicationEndpoint {
                                 requestCom.getMessage(),
                                 requestCom.getEmailTo().orElse(null),
                                 requestCom.getSlackTo().orElse(null),
+                                requestCom.getUser(),
                                 requestCom.getScheduledTime(), null, null)))
                         .switchIfEmpty(communicationRepository.save(new Communication(id,
                                 requestCom.getMessage(),
                                 requestCom.getEmailTo().orElse(null),
                                 requestCom.getSlackTo().orElse(null),
+                                requestCom.getUser(),
                                 requestCom.getScheduledTime(), null, null)))
         );
 

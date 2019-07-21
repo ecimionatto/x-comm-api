@@ -21,7 +21,7 @@ public class Communication {
     private final String message;
     private final String emailTo;
     private final String slackTo;
-
+    private final String user;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
     private final Date scheduledTime;
     private final CommunicationStatus status;
@@ -32,6 +32,7 @@ public class Communication {
                          @JsonProperty(value = "message", required = true) final String message,
                          @JsonProperty(value = "emailTo") final String emailTo,
                          @JsonProperty(value = "slackTo") final String slackTo,
+                         @JsonProperty(value = "user", required = true) final String user,
                          @JsonProperty(value = "scheduledTime", required = true) final Date scheduledTime,
                          @JsonProperty(value = "status") final CommunicationStatus status,
                          @JsonProperty(value = "error") final String error
@@ -41,9 +42,14 @@ public class Communication {
         this.message = message;
         this.emailTo = emailTo;
         this.slackTo = slackTo;
+        this.user = user;
         this.scheduledTime = scheduledTime;
         this.status = status == null ? CommunicationStatus.PENDING : status;
         this.error = error;
+    }
+
+    public String getUser() {
+        return user;
     }
 
     public Optional<String> getSlackTo() {
@@ -78,11 +84,18 @@ public class Communication {
     }
 
     public Communication withStatus(CommunicationStatus communicationStatus) {
-        return new Communication(this.id, this.message, this.emailTo, this.slackTo, this.scheduledTime, communicationStatus, null);
+        return new Communication(this.id, this.message, this.emailTo,
+                this.slackTo, this.user, this.scheduledTime, communicationStatus, null);
+    }
+
+    public Communication withUser(final String user) {
+        return new Communication(this.id, this.message, this.emailTo,
+                this.slackTo, user, this.scheduledTime, this.status, null);
     }
 
     public Communication withError(String error) {
-        return new Communication(this.id, this.message, this.emailTo, this.slackTo, this.scheduledTime, CommunicationStatus.ERROR, error);
+        return new Communication(this.id, this.message, this.emailTo,
+                this.slackTo, this.user, this.scheduledTime, CommunicationStatus.ERROR, error);
     }
 
     public CommunicationStatus getStatus() {
@@ -93,12 +106,16 @@ public class Communication {
         return Optional.ofNullable(error);
     }
 
+    public boolean isPending() {
+        return this.status == CommunicationStatus.PENDING;
+    }
+
     public enum CommunicationType {
         SLACK, EMAIL
     }
 
     public enum CommunicationStatus {
-        PENDING, SENT, ERROR
+        PENDING, SENT, ERROR, DELETED
     }
 
 }
